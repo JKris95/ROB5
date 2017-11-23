@@ -2,6 +2,9 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
+#define LTF analogRead(A2)
+#define LTB analogRead(A3)
+
 // RF variables
 RF24 radio(8, 3); // CE, CSN
 const byte address[6] = "00001";
@@ -29,7 +32,7 @@ void drivingDirection()
     if (radio.available())// If the NRF240L01 module received data
     { 
       radio.read(&receivedData, sizeof(receivedData)); // Read the data and put it into character array
-      delay(20);
+      delay(15);
       //Serial.println("received is f");
     }
     else
@@ -42,9 +45,22 @@ void drivingDirection()
   
 }
 
-void detectBoundary
+void detectBoundary()
 {
-  
+if (analogRead(A2)>600){
+  _mBack();
+  delay(1000);
+  digitalWrite(ENA,LOW);
+  digitalWrite(ENB,LOW);
+  delay(200);
+if (analogRead(A3)>600){
+  _mForward();
+  delay(1000);
+  digitalWrite(ENA,LOW);
+  digitalWrite(ENB,LOW);
+  delay(200);
+  }
+  }
 }
 /*define forward function*/
 void _mForward()
@@ -56,6 +72,17 @@ void _mForward()
   digitalWrite(in3,LOW);
   digitalWrite(in4,HIGH);
   Serial.println("Forward");
+}
+
+void _mBack()
+{
+  analogWrite(ENA,100);
+  analogWrite(ENB,100);
+  digitalWrite(in1,HIGH);
+  digitalWrite(in2,LOW);
+  digitalWrite(in3,HIGH);
+  digitalWrite(in4,LOW);
+  Serial.println("Back");
 }
 
 void _mRight()
@@ -88,21 +115,12 @@ void setup()
 
 void loop()
 {
- /*
-   if (radio.available()) {   // If the NRF240L01 module received data
-    radio.read(&receivedData, sizeof(receivedData)); // Read the data and put it into character array
-    //delay(10);
-   for(int i; i<15000; i++){
-   
-     while  (radio.available())
-     {    
-      _mForward();
-     i=0;
-     }
-   } */
 
+
+
+  detectBoundary();
   drivingDirection();
-  Serial.println(receivedData);
+  //Serial.println(receivedData);
   
   if (receivedData == 'f')
   {
