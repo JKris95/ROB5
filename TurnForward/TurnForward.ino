@@ -114,7 +114,7 @@ void setup()
 
 void loop()
 { 
-  //detectBoundary();
+  detectBoundary();
   drivingDirection();
   Serial.println(receivedData);
   
