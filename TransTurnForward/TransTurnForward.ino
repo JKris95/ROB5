@@ -28,7 +28,7 @@ void loop()
      Serial.println("Trykket");
      Serial.println(forward);
      radio.write(&forward, sizeof(forward));
-     delay(20);
+     delay(10);
   }
   
 }
