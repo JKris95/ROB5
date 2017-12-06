@@ -138,14 +138,33 @@ void setup()
 
 void loop()
 {
-  //Serial.println(digitalRead(10));
+  drivingDirection();
+  Serial.println(receivedData);
   if(receivedData == 'f'){
     while(true){
       detectBoundary();
       drivingDirection();
       //Serial.println(receivedData);
-      
-      if (receivedData == 'f')
+
+      switch (receivedData) {
+        case 'f':
+          _mForward();
+          break;
+        case 'b':
+          _mBack();
+          break;
+        case 'l':
+          _mLeft();
+          break;
+        case 'r':
+          _mRight();
+          break;
+        default:
+          _mStop();
+          break;
+      }
+
+      /*if (receivedData == 'f')
       {
         _mForward(); 
       }
@@ -162,7 +181,7 @@ void loop()
         _mRight();
       }
       else
-        _mStop();
+        _mStop();*/
   }
  }
  if(receivedData == 'p'){
