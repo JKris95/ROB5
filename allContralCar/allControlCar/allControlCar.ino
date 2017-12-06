@@ -23,6 +23,7 @@ int in4=7;
 /*define channel enable output pins*/
 int ENA=5;
 int ENB=9;
+//button pin
 
 
 void drivingDirection()
@@ -32,7 +33,7 @@ void drivingDirection()
     if (radio.available())// If the NRF240L01 module received data
     { 
       radio.read(&receivedData, sizeof(receivedData)); // Read the data and put it into character array
-      delay(15);
+      delay(20);
       //Serial.println("received is f");
     }
     else
@@ -47,26 +48,28 @@ void drivingDirection()
 
 void detectBoundary()
 {
-if (analogRead(A2)>600){
-  _mBack();
-  delay(1000);
-  digitalWrite(ENA,LOW);
-  digitalWrite(ENB,LOW);
-  delay(200);
-}
-if (analogRead(A3)>600){
-  _mForward();
-  delay(1000);
-  digitalWrite(ENA,LOW);
-  digitalWrite(ENB,LOW);
-  delay(200);
+  if (LTF>600)
+  {
+    _mBack();
+    delay(1000);
+    digitalWrite(ENA,LOW);
+    digitalWrite(ENB,LOW);
+    delay(200);
+  }
+  if (LTB>600)
+  {
+    _mForward();
+    delay(1000);
+    digitalWrite(ENA,LOW);
+    digitalWrite(ENB,LOW);
+    delay(200);
   }
 }
-/*define forward function*/
+/*define driving functions*/
 void _mForward()
 { 
-  analogWrite(ENA,150);
-  analogWrite(ENB,150);
+  analogWrite(ENA,100);
+  analogWrite(ENB,100);
   digitalWrite(in1,LOW);
   digitalWrite(in2,HIGH);
   digitalWrite(in3,LOW);
@@ -87,13 +90,32 @@ void _mBack()
 
 void _mRight()
 {
-  analogWrite(ENA,100);
+  analogWrite(ENA,130);
   analogWrite(ENB,100);
   digitalWrite(in1,HIGH);
   digitalWrite(in2,LOW);
   digitalWrite(in3,LOW);
   digitalWrite(in4,HIGH);
   Serial.println("Right");
+}
+
+void _mLeft()
+{
+  analogWrite(ENA,105);
+  analogWrite(ENB,130);
+  digitalWrite(in1,LOW);
+  digitalWrite(in2,HIGH);
+  digitalWrite(in3,HIGH);
+  digitalWrite(in4,LOW);
+  Serial.println("Left");
+}
+
+void _mStop()
+{
+  digitalWrite(ENA, LOW);
+  digitalWrite(ENB, LOW);
+  Serial.println("stop");
+  
 }
 
 void setup()
@@ -111,20 +133,50 @@ void setup()
   radio.openReadingPipe(0, address); // Read from address given as 2nd argument
   radio.setPALevel(RF24_PA_MIN); // Set power level - affects range
   radio.startListening(); // Define as receiver
+  pinMode(10, INPUT_PULLUP);
 }
 
 void loop()
 {
-  detectBoundary();
-  drivingDirection();
-  //Serial.println(receivedData);
-  
-  if (receivedData == 'f')
-  {
-    _mForward(); 
+  //Serial.println(digitalRead(10));
+  if(receivedData == 'f'){
+    while(true){
+      detectBoundary();
+      drivingDirection();
+      //Serial.println(receivedData);
+      
+      if (receivedData == 'f')
+      {
+        _mForward(); 
+      }
+      else if (receivedData == 'b')
+      {
+        _mBack();
+      }
+      else if (receivedData == 'l')
+      {
+        _mLeft();
+      }
+      else if (receivedData == 'r')
+      {
+        _mRight();
+      }
+      else
+        _mStop();
   }
-  else
-    _mRight();
+ }
+ if(receivedData == 'p'){
+  while(true){
+    detectBoundary();
+    drivingDirection();
+    Serial.println(receivedData);
     
-  
+    if (receivedData == 'p')
+    {
+      _mForward(); 
+    }
+    else
+      _mRight(); 
+ }
+ }
 }

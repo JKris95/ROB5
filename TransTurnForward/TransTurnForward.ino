@@ -6,7 +6,7 @@
 
 RF24 radio(7, 8); // CE, CSN
 const byte address[6] = "00001";
-const char forward = 'f';
+const char forward = 'p';
 int switchState = 0;
 
 void setup() 

@@ -4,6 +4,9 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
+#define LTF analogRead(A2)
+#define LTB analogRead(A3)
+
 const int in1=4;
 const int in2=2;
 const int in3=6;
@@ -19,6 +22,44 @@ int  xAxis, yAxis;
 int motorSpeedA = 0;
 int motorSpeedB = 0;
 
+void detectBoundary(){
+if (analogRead(A2)>600){
+  _mBack();
+  delay(1000);
+  digitalWrite(ENA,LOW);
+  digitalWrite(ENB,LOW);
+  delay(200);
+if (analogRead(A3)>500){
+  _mForward();
+  delay(1000);
+  digitalWrite(ENA,LOW);
+  digitalWrite(ENB,LOW);
+  delay(200);
+  }
+  }
+}
+
+void _mForward()
+{ 
+  analogWrite(ENA,100);
+  analogWrite(ENB,100);
+  digitalWrite(in1,LOW);
+  digitalWrite(in2,HIGH);
+  digitalWrite(in3,LOW);
+  digitalWrite(in4,HIGH);
+  //Serial.println("Forward");
+}
+
+void _mBack()
+{
+  analogWrite(ENA,100);
+  analogWrite(ENB,100);
+  digitalWrite(in1,HIGH);
+  digitalWrite(in2,LOW);
+  digitalWrite(in3,HIGH);
+  digitalWrite(in4,LOW);
+ //Serial.println("Back");
+}
 void setup() {
   pinMode(ENA, OUTPUT);
   pinMode(ENB, OUTPUT);
@@ -36,15 +77,9 @@ void setup() {
 }
 
 void loop() {
-
-   // Default direction
-   // Set Motor A forward
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
-    // Set Motor B forward
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, HIGH);
-  
+Serial.println(analogRead(A3));
+ 
+detectBoundary();
   if (radio.available()) {   // If the NRF240L01 module received data
     radio.read(&receivedData, sizeof(receivedData)); // Read the data and put it into character array
     xAxis = atoi(&receivedData[0]); // Convert the data from the character array (received X value) into integer
@@ -54,8 +89,8 @@ void loop() {
     delay(10);
   }
 
-  Serial.println(xAxis);
-  Serial.println(yAxis);
+  //Serial.println(xAxis);
+  //Serial.println(yAxis);
   
   // Y-axis used for forward and backward control
   if (yAxis > 480) {
