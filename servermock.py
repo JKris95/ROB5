@@ -13,7 +13,7 @@ times = [b'0100',b'0200',b'0300',b'0400',b'0500',b'0600',b'0700',b'0800',b'0900'
 
 sendList = [b'False', b'False', b'False']
 index = 0
-numberofclients = 1
+numberofclients = 3
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def socket_bind(HOST,PORT,numberofclients): #setting up the socket, limitied to a fixed number of cones
